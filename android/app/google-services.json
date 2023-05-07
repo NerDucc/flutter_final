@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "411278807028",
+    "firebase_url": "https://final-year-a044f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "final-year-a044f",
+    "storage_bucket": "final-year-a044f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411278807028:android:8ca1451f245a8183aab3a1",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHv37Wramwf1kCvsQa61XwWNf_pT4IsrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411278807028:android:764db47c0d3eefe7aab3a1",
+        "android_client_info": {
+          "package_name": "com.example.final_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHv37Wramwf1kCvsQa61XwWNf_pT4IsrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411278807028:android:ca00e365388d1852aab3a1",
+        "android_client_info": {
+          "package_name": "com.example.flutter_parking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHv37Wramwf1kCvsQa61XwWNf_pT4IsrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411278807028-tkooufu9u5k2i4io9uhrun2amm372the.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
