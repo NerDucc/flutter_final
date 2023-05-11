@@ -1,5 +1,3 @@
-
-
 import 'package:admin/management/home.dart';
 import 'package:admin/management/map.dart';
 import 'package:admin/management/route_names.dart';
@@ -33,6 +31,4 @@ class MyApp extends StatelessWidget{
     );
      
   }
-
-
 }

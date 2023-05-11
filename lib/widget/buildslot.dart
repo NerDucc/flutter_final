@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class BuildSlots extends StatelessWidget {
   final int status;
-  // final int index;
+  final int index;
 
   const BuildSlots({
     super.key,
     required this.status,
-    // required this.index
+    required this.index
   });
 
   @override
@@ -16,7 +16,7 @@ class BuildSlots extends StatelessWidget {
            status == 1 ? Padding(
                                 padding: const EdgeInsets.all(2.5),
                                 child: Container(
-                                  // child: Text(index.toString()),
+                                  child: Text(index.toString()),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     color: Colors.white,

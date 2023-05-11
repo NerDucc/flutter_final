@@ -126,7 +126,7 @@ class _MapParkState extends State<MapPark> {
                                   return BuildSlots(
                                       // index: ,
                                       status: list1[index].dataSlot.status,
-                                      // index: list1[index].dataSlot.index,
+                                      index: list1[index].dataSlot.index,
                                       );
                                 }),
                           ),
