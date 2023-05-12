@@ -3,7 +3,6 @@ import 'package:admin/management/route_names.dart';
 import 'package:admin/model/slot_model.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Home extends StatefulWidget {
@@ -16,9 +15,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     dropdownStatus = statusList[0];
+    selectStatus = status1[0];
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -32,7 +31,9 @@ class _HomeState extends State<Home> {
   late bool autoStatus = true;
   bool updateSlot = false;
   int? dropdownStatus;
+  int? selectStatus;
   late String filter_toast = "";
+  late int slotCount;
 
   // List of items in our dropdown menu
   final statusList = [
@@ -40,6 +41,7 @@ class _HomeState extends State<Home> {
     1,
     0,
   ];
+  List<int> status1 = [0, 1, 2];
 
   @override
   Widget build(BuildContext context) {
@@ -50,58 +52,62 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.green,
         title: customSearchBar,
         actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                if (customIcon.icon == Icons.search) {
-                  autoStatus = false;
-                  customIcon = Icon(Icons.cancel);
-                  customSearchBar = ListTile(
-                    leading: DropdownButton(
-                      value: dropdownStatus,
-                      icon: const Icon(Icons.filter_list_sharp),
-                      items: statusList.map((dropdownStatus) {
-                        return DropdownMenuItem(
+          StatefulBuilder(
+            builder: (context, stfState) {
+              return IconButton(
+              onPressed: () {
+                setState(() {
+                  if (customIcon.icon == Icons.search) {
+                    autoStatus = false;
+                    customIcon = Icon(Icons.cancel);
+                    customSearchBar = ListTile(
+                      leading: StatefulBuilder(
+                        builder: (context, setState) => DropdownButton(
                           value: dropdownStatus,
-                          child: dropdownStatus == 0
-                              ? Text("Index")
-                              : dropdownStatus == 1
-                                  ? Text("Status")
-                                  : Text("Filter"),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          dropdownStatus = newValue;
-                        });
-                      },
-                    ),
-                    title: TextField(
-                        controller: searchFilter,
-                        decoration: InputDecoration(
-                          hintText: 'type in slot data...',
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontStyle: FontStyle.italic,
+                          icon: const Icon(Icons.filter_list_sharp),
+                          onChanged: (newValue) {
+                            dropdownStatus = newValue;
+                            setState(() {});
+                          },
+                          items: statusList.map((dropdownStatus) {
+                            return DropdownMenuItem(
+                              value: dropdownStatus,
+                              child: dropdownStatus == 0
+                                  ? Text("Index")
+                                  : dropdownStatus == 1
+                                      ? Text("Status")
+                                      : Text("Filter"),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      title: TextField(
+                          controller: searchFilter,
+                          decoration: InputDecoration(
+                            hintText: 'type in slot data...',
+                            hintStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            border: InputBorder.none,
                           ),
-                          border: InputBorder.none,
-                        ),
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        onChanged: (String value) {
-                          setState(() {});
-                        }),
-                  );
-                } else {
-                  customIcon = const Icon(Icons.search);
-                  customSearchBar = const Text('Manage slots');
-                  autoStatus = true;
-                }
-              });
-            },
-            icon: customIcon,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                          onChanged: (String value) {
+                            setState(() {});
+                          }),
+                    );
+                  } else {
+                    customIcon = const Icon(Icons.search);
+                    customSearchBar = const Text('Manage slots');
+                    autoStatus = true;
+                  }
+                });
+              },
+              icon: customIcon,
+            );},
           )
         ],
       ),
@@ -151,12 +157,12 @@ class _HomeState extends State<Home> {
               },
             ),
             ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text("Logout"),
-                  onTap: () {
-                    Navigator.pushNamed(context, RouteNames.Login);
-                  },
-                )
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () {
+                Navigator.pushNamed(context, RouteNames.Login);
+              },
+            )
           ],
         ),
       ),
@@ -177,25 +183,31 @@ class _HomeState extends State<Home> {
               });
               list1
                   .sort((a, b) => a.dataSlot.index.compareTo(b.dataSlot.index));
+              
               return ListView.builder(
                   itemCount: list1.length,
                   itemBuilder: (context, index) {
                     final indexSlot = list1[index].dataSlot.index.toString();
                     final statusSlot = list1[index].dataSlot.status.toString();
-
+                    slotCount = list1.length;
                     if (dropdownStatus == 2) {
                       if (searchFilter.text.isEmpty) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -209,15 +221,20 @@ class _HomeState extends State<Home> {
                           .contains(searchFilter.text.toLowerCase())) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -231,15 +248,20 @@ class _HomeState extends State<Home> {
                           .contains(dropdownStatus.toString())) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -255,15 +277,20 @@ class _HomeState extends State<Home> {
                       if (searchFilter.text.isEmpty) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -277,15 +304,20 @@ class _HomeState extends State<Home> {
                           .contains(searchFilter.text.toString())) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -301,15 +333,20 @@ class _HomeState extends State<Home> {
                       if (searchFilter.text.isEmpty) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -323,15 +360,20 @@ class _HomeState extends State<Home> {
                           .contains(searchFilter.text.toLowerCase())) {
                         return InkWell(
                           onTap: () {
+                            selectStatus = list1[index].dataSlot.status;
                             indexTextController.text =
                                 list1[index].dataSlot.index.toString();
-                            statusTextController.text =
-                                list1[index].dataSlot.status.toString();
+                            // statusTextController.text =
+                            //     list1[index].dataSlot.status.toString();
                             updateSlot = true;
                             slotDialog(list1[index].key);
                           },
                           child: ListTile(
-                            trailing: Icon(Icons.sensor_occupied),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  _showMyDeleteDialog(list1[index]);
+                                },
+                                icon: Icon(Icons.sensor_occupied)),
                             title: Text(list1[index].dataSlot.index.toString()),
                             subtitle: list1[index].dataSlot.status == 1
                                 ? Text("Available")
@@ -350,8 +392,9 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         onPressed: () {
-          indexTextController.text = "";
-          statusTextController.text = "";
+          indexTextController.text = slotCount.toString();
+          selectStatus = 0;
+          // statusTextController.text = "";
           updateSlot = false;
           slotDialog("");
         },
@@ -372,13 +415,52 @@ class _HomeState extends State<Home> {
         fontSize: 15.0);
   }
 
+  Future<void> _showMyDeleteDialog(SlotModel slot) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return Form(
+          key: _formKey,
+          child: AlertDialog(
+            title: Text('Delete data!!'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: const <Widget>[
+                  Text('Would you like to delete this data?'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Confirm'),
+                onPressed: () {
+                  ref.child(slot.key!).remove().then((value) => {
+                        Navigator.of(context).pop(),
+                        toast("Delete success", true)
+                      });
+                  // print(slot.key);
+                },
+              ),
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void slotDialog(String? key) {
     showDialog(
         context: context,
         builder: (context) {
-          return Form(
-            key: _formKey,
-            child: AlertDialog(
+          return StatefulBuilder(
+            builder: (context, stfsetState) => AlertDialog(
               title: Text(updateSlot ? "Edit slot" : "Add new slot"),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -393,10 +475,11 @@ class _HomeState extends State<Home> {
                         }
                         return null;
                       },
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      ],
+                      enabled: false,
+                      // keyboardType: TextInputType.number,
+                      // inputFormatters: <TextInputFormatter>[
+                      //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      // ],
                       decoration: InputDecoration(
                         label: Text("Index"),
                         contentPadding: EdgeInsets.only(
@@ -407,48 +490,55 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: statusTextController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Status value can not be empty';
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-3]')),
-                      ],
-                      decoration: InputDecoration(
-                        label: Text("Status"),
-                        contentPadding: EdgeInsets.only(
-                            top: 20), // add padding to adjust text
-                        isDense: true,
-                        prefixIcon: Icon(Icons.stadium),
-                      ),
-                    ),
-                  ),
+                      padding: EdgeInsets.all(8.0),
+                      child: DropdownButtonFormField(
+                        hint: Text('Status'),
+                        value: selectStatus,
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                        isExpanded:
+                            true, //make true to take width of parent widget
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.stadium),
+                        ),
+                        onChanged: (newValue) {
+                          stfsetState(() {
+                            selectStatus = newValue;
+                          });
+                        },
+                        items: status1.map((dropdownStatus) {
+                          return DropdownMenuItem(
+                            value: dropdownStatus,
+                            child: dropdownStatus == 0
+                                ? Text("Not Using")
+                                : dropdownStatus == 1
+                                    ? Text("Available")
+                                    : Text("Occupied"),
+                          );
+                        }).toList(),
+                      )),
+
                   Padding(
                     padding: const EdgeInsets.only(left: 100),
                     child: TextButton(
                         onPressed: () {
-                          if(_formKey.currentState!.validate()){
+                          
                             Map<String, Object?> slotData = {
-                            "index": int.parse(indexTextController.text),
-                            "status": int.parse(statusTextController.text),
-                          };
-                          if (updateSlot == true) {
-                            ref.child(key!).update(slotData).then((value) => {
-                                  toast("Insert successfully", false),
-                                  Navigator.of(context).pop()
-                                });
-                          } else {
-                            ref.push().set(slotData).then((value) {
-                              toast("Update successfully", false);
-                              Navigator.of(context).pop();
-                            });
-                          }}
+                              "index": int.parse(indexTextController.text),
+                              // "status": int.parse(statusTextController.text),
+                              "status": selectStatus,
+                            };
+                            if (updateSlot == true) {
+                              ref.child(key!).update(slotData).then((value) =>
+                                  {
+                                    toast("Update successfully", false),
+                                    Navigator.of(context).pop()
+                                  });
+                            } else {
+                              ref.push().set(slotData).then((value) {
+                                toast("Insert successfully", false);
+                                Navigator.of(context).pop();
+                              });
+                            }
                         },
                         child: Text(
                           updateSlot ? "Edit" : "Submit",

@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget{
         RouteNames.Login:(context) => const Login(),
         RouteNames.ForgotPassword:(context) => const ForgotPassword(),
         },
-        initialRoute: RouteNames.Login,
+        initialRoute: RouteNames.Home,
     );
      
   }
